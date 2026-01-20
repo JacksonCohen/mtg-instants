@@ -1,0 +1,49 @@
+import 'server-only';
+import type { ScryfallCard, ScryfallListResponse, ScryfallSet } from './scryfall';
+
+export async function fetchSets(): Promise<ScryfallSet[]> {
+  "use cache";
+  
+  const response = await fetch('https://api.scryfall.com/sets', {
+    next: { revalidate: 86400 } // Cache for 24 hours
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch sets');
+  }
+  
+  const data: ScryfallListResponse<ScryfallSet> = await response.json();
+  
+  // Filter to expansion, core, masters, draft_innovation sets (main playable sets)
+  const validTypes = ['expansion', 'core', 'masters', 'draft_innovation', 'commander', 'funny'];
+  return data.data
+    .filter(set => validTypes.includes(set.set_type) && set.card_count > 0)
+    .sort((a, b) => new Date(b.released_at).getTime() - new Date(a.released_at).getTime());
+}
+
+export async function fetchInstantsFromSet(setCode: string): Promise<ScryfallCard[]> {
+  const query = encodeURIComponent(`set:${setCode} type:instant`);
+  let allCards: ScryfallCard[] = [];
+  let url: string | null = `https://api.scryfall.com/cards/search?q=${query}&order=cmc`;
+  
+  while (url) {
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 24 hours
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        // No instant cards in this set
+        return [];
+      }
+      throw new Error('Failed to fetch cards');
+    }
+    
+    const data: ScryfallListResponse<ScryfallCard> = await response.json();
+    allCards = [...allCards, ...data.data];
+    url = data.has_more ? data.next_page ?? null : null;
+  }
+  
+  return allCards;
+}
+
