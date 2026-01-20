@@ -71,7 +71,7 @@ export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: 
   const hasActiveFilters = filters.colors.length > 0 || filters.manaValues.length > 0 || filters.counterOnly;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4">
       {/* Results count */}
       <div className="h-7 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">

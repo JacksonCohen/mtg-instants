@@ -133,10 +133,7 @@ export function SetViewContent({ cards }: SetViewContentProps) {
                 <div className="mt-4">
                   <FilterSidebar
                     filters={filters}
-                    onChange={(newFilters) => {
-                      handleFilterChange(newFilters);
-                      setMobileFilterOpen(false);
-                    }}
+                    onChange={handleFilterChange}
                     totalCards={cards.length}
                     filteredCount={filteredCards.length}
                   />
