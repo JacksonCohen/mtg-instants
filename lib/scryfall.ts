@@ -103,8 +103,7 @@ export function classifyCounterSpell(oracleText: string): CounterType | null {
   }
   
   // Soft/tempo counters
-  if ((text.includes('counter') && text.includes('return')) || 
-      text.includes('counter target spell. its controller') ||
+  if (text.includes('counter target spell. its controller') ||
       text.includes('remand')) {
     return 'soft_counter';
   }
