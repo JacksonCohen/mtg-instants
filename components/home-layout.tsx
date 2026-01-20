@@ -15,7 +15,6 @@ export function HomeLayout({ sets }: HomeLayoutProps) {
 
   return (
     <>
-      {/* Header */}
       <header className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -37,7 +36,6 @@ export function HomeLayout({ sets }: HomeLayoutProps) {
         </div>
       </header>
 
-      {/* Compact Hero */}
       <section className="border-b border-border py-6">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-xl font-semibold text-foreground mb-1">
@@ -49,7 +47,6 @@ export function HomeLayout({ sets }: HomeLayoutProps) {
         </div>
       </section>
 
-      {/* Main content */}
       <main className="container mx-auto px-4 py-8">
         <SetGrid sets={sets} searchQuery={searchQuery} />
       </main>

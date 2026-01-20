@@ -1,11 +1,7 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'MTG Instant Reference - Find Counterspells & Interaction',
@@ -43,7 +39,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://svgs.scryfall.io" crossOrigin="" />
         <link rel="dns-prefetch" href="https://svgs.scryfall.io" />
       </head>
-      <body className={`font-sans antialiased`}>
+      <body className="font-sans antialiased">
         {children}
         <Analytics />
       </body>

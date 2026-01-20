@@ -3,12 +3,12 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { fetchSets, fetchInstantsFromSet } from "@/lib/scryfall-server";
 import { SetViewContent } from "./set-view-content";
 import { SetSearch } from "@/components/set-search";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
 interface SetPageProps {
   params: Promise<{ code: string }>;

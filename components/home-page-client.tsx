@@ -17,7 +17,6 @@ export function HomePageClient({ sets }: HomePageClientProps) {
       {/* Floating search for header - rendered here but positioned in header via portal effect */}
       <FloatingHeaderSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* Main content */}
       <main className="container mx-auto px-4 py-8">
         <SetGrid sets={sets} searchQuery={searchQuery} />
       </main>

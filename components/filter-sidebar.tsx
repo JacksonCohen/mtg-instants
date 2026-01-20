@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 export interface FilterState {
   colors: string[];
