@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: SetPageProps) {
   }
 
   return {
-    title: `${set.name} Instants - MTG Instant Reference`,
-    description: `Browse all instant spells, counterspells, and interaction from ${set.name} (${set.code.toUpperCase()})`,
+    title: `${set.name} Instant-Speed Cards - MTG Instant Reference`,
+    description: `Browse all instant-speed cards, counterspells, flash creatures, and interaction from ${set.name} (${set.code.toUpperCase()})`,
   };
 }
 
@@ -71,7 +71,7 @@ export default async function SetPage({ params }: SetPageProps) {
                     {set.name}
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    {cards.length} instant{cards.length !== 1 ? "s" : ""} found
+                    {cards.length} card{cards.length !== 1 ? "s" : ""} found
                   </p>
                 </div>
               </div>

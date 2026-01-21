@@ -29,7 +29,7 @@ export function HomeLayout({ sets }: HomeLayoutProps) {
                   MTG Instant Reference
                 </h1>
                 <p className="text-sm text-muted-foreground hidden sm:block">
-                  Find counterspells & interaction fast
+                  Find instant-speed interaction fast
                 </p>
               </div>
             </div>
