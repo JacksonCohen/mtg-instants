@@ -20,6 +20,7 @@ export interface ScryfallCard {
   oracle_text: string;
   colors: string[];
   color_identity: string[];
+  keywords?: string[];
   rarity: string;
   set: string;
   set_name: string;

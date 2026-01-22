@@ -1,17 +1,20 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { parseManaString, isValidManaString } from "@/lib/mana-parser";
 
 export interface FilterState {
   colors: string[];
   manaValues: number[];
   counterOnly: boolean;
+  manaInput: string;
 }
 
 interface FilterSidebarProps {
@@ -33,6 +36,8 @@ const MTG_COLORS = [
 const MANA_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: FilterSidebarProps) {
+  const [localManaInput, setLocalManaInput] = useState(filters.manaInput);
+
   const toggleColor = useCallback(
     (colorCode: string) => {
       const newColors = filters.colors.includes(colorCode)
@@ -60,15 +65,35 @@ export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: 
     [filters, onChange]
   );
 
+
   const clearFilters = useCallback(() => {
+    setLocalManaInput("");
     onChange({
       colors: [],
       manaValues: [],
       counterOnly: false,
+      manaInput: "",
     });
   }, [onChange]);
 
-  const hasActiveFilters = filters.colors.length > 0 || filters.manaValues.length > 0 || filters.counterOnly;
+  // Debounced mana input handler
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localManaInput !== filters.manaInput) {
+        const parsed = parseManaString(localManaInput);
+        onChange({
+          ...filters,
+          manaInput: localManaInput,
+          colors: parsed.colors,
+          manaValues: parsed.manaValues,
+        });
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [localManaInput, filters, onChange]);
+
+  const hasActiveFilters = filters.colors.length > 0 || filters.manaValues.length > 0 || filters.counterOnly || filters.manaInput.trim() !== "";
 
   return (
     <div className="space-y-5 px-4">
@@ -79,7 +104,7 @@ export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: 
           <span className="font-semibold text-foreground">{totalCards}</span>
         </p>
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary hover:text-primary/80 h-7 px-2 hover:bg-transparent cursor-pointer">
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary h-7 px-2 hover:bg-transparent hover:text-foreground cursor-pointer">
             Clear
           </Button>
         )}
@@ -143,6 +168,27 @@ export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: 
             );
           })}
         </div>
+      </div>
+
+      {/* Mana Input */}
+      <div>
+        <Label htmlFor="mana-input" className="text-xs font-semibold mb-2 block text-muted-foreground uppercase tracking-wide">
+          Available Mana
+        </Label>
+        <Input
+          id="mana-input"
+          type="text"
+          placeholder="e.g., UUB or island island swamp"
+          value={localManaInput}
+          onChange={(e) => setLocalManaInput(e.target.value)}
+          className={cn(
+            "text-sm border-foreground/30",
+            localManaInput && !isValidManaString(localManaInput) && "border-destructive focus-visible:ring-destructive"
+          )}
+        />
+        <p className="text-xs text-muted-foreground mt-1.5">
+          Enter your available mana (e.g., UUB, island island swamp, or blue blue black)
+        </p>
       </div>
 
       {/* Counterspells Only Toggle */}
