@@ -3,13 +3,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ScryfallCard } from "@/lib/scryfall";
-import { getCardColors } from "@/lib/scryfall";
+import { getCardColors, getCardImageUrl } from "@/lib/scryfall";
 import { CardGrid } from "@/components/card-grid";
 import { FilterSidebar, type FilterState } from "@/components/filter-sidebar";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Filter } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Filter, Info } from "lucide-react";
 
 interface SetViewContentProps {
   cards: ScryfallCard[];
@@ -19,8 +21,9 @@ function parseFiltersFromUrl(searchParams: URLSearchParams): FilterState {
   const colors = searchParams.get("colors")?.split(",").filter(Boolean) || [];
   const manaValues = searchParams.get("mv")?.split(",").map(Number).filter(n => !Number.isNaN(n)) || [];
   const counterOnly = searchParams.get("counter") === "true";
+  const manaInput = searchParams.get("mana") || "";
 
-  return { colors, manaValues, counterOnly };
+  return { colors, manaValues, counterOnly, manaInput };
 }
 
 function filtersToUrl(filters: FilterState): string {
@@ -34,6 +37,9 @@ function filtersToUrl(filters: FilterState): string {
   if (filters.counterOnly) {
     params.set("counter", "true");
   }
+  if (filters.manaInput.trim() !== "") {
+    params.set("mana", filters.manaInput);
+  }
   return params.toString();
 }
 
@@ -41,7 +47,7 @@ export function SetViewContent({ cards }: SetViewContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  
+
   const [filters, setFilters] = useState<FilterState>(() =>
     parseFiltersFromUrl(searchParams)
   );
@@ -57,7 +63,7 @@ export function SetViewContent({ cards }: SetViewContentProps) {
   // Clear filters when leaving the page
   useEffect(() => {
     return () => {
-      setFilters({ colors: [], manaValues: [], counterOnly: false });
+      setFilters({ colors: [], manaValues: [], counterOnly: false, manaInput: "" });
     };
   }, []);
 
@@ -80,7 +86,7 @@ export function SetViewContent({ cards }: SetViewContentProps) {
       if (filters.manaValues.length > 0) {
         const cardMv = Math.floor(card.cmc);
         // 10 represents "10+"
-        const matches = filters.manaValues.some(mv => 
+        const matches = filters.manaValues.some(mv =>
           mv === 10 ? cardMv >= 10 : cardMv === mv
         );
         if (!matches) return false;
@@ -89,6 +95,42 @@ export function SetViewContent({ cards }: SetViewContentProps) {
       // Counterspell filter (using Scryfall tags)
       if (filters.counterOnly) {
         if (!card.isCounterspell) return false;
+      }
+
+      return true;
+    });
+  }, [cards, filters]);
+
+  // Detect convoke cards that might be castable but are filtered out
+  const convokeCardsFiltered = useMemo(() => {
+    // Only show convoke warning if we have color filters from mana input
+    if (filters.colors.length === 0) return [];
+
+    return cards.filter((card) => {
+      // Check if card has convoke
+      const hasConvoke = card.keywords?.some(k => k.toLowerCase() === "convoke");
+      if (!hasConvoke) return false;
+
+      // Check if it matches color filters - card must be castable with the available colors
+      const cardColors = getCardColors(card);
+      const hasMatchingColor = filters.colors.some((color) => {
+        if (color === "C") {
+          return cardColors.length === 0 || cardColors.includes("C") || cardColors.every(c => c === "C");
+        }
+        return cardColors.includes(color);
+      });
+      if (!hasMatchingColor) return false;
+
+      // Check if it matches counterspell filter (if active)
+      if (filters.counterOnly && !card.isCounterspell) return false;
+
+      // Exclude cards that are already in the filtered results
+      const cardMv = Math.floor(card.cmc);
+      if (filters.manaValues.length > 0) {
+        const alreadyShown = filters.manaValues.some(mv =>
+          mv === 10 ? cardMv >= 10 : cardMv === mv
+        );
+        if (alreadyShown) return false;
       }
 
       return true;
@@ -118,6 +160,40 @@ export function SetViewContent({ cards }: SetViewContentProps) {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
+          {/* Convoke warning */}
+          {convokeCardsFiltered.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Alert className="mb-4 cursor-pointer hover:bg-accent/50 transition-colors group">
+                  <Info className="h-4 w-4 group-hover:text-foreground transition-colors" />
+                  <AlertDescription className="group-hover:text-foreground transition-colors">
+                    {convokeCardsFiltered.length} card{convokeCardsFiltered.length !== 1 ? 's' : ''} with Convoke {convokeCardsFiltered.length !== 1 ? 'are' : 'is'} not shown but may be castable with creatures on the battlefield. Click to view.
+                  </AlertDescription>
+                </Alert>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[600px] max-w-[90vw]">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm">Cards with Convoke</h4>
+                  <div className="grid grid-cols-3 gap-2 max-h-[70vh] overflow-y-auto pr-2">
+                    {convokeCardsFiltered.map((card) => (
+                      <div
+                        key={card.id}
+                        className="overflow-hidden rounded-lg transition-all"
+                      >
+                        <img
+                          src={getCardImageUrl(card, 'normal')}
+                          alt={card.name}
+                          className="w-full h-auto object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
           {/* Mobile filter button */}
           <div className="lg:hidden mb-4">
             <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
