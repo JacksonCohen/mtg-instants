@@ -26,10 +26,10 @@ export function HomeLayout({ sets }: HomeLayoutProps) {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground tracking-tight">
-                  MTG Instant Reference
+                  MTG Counterplay Reference
                 </h1>
                 <p className="text-sm text-muted-foreground hidden sm:block">
-                  Find instant-speed interaction fast
+                  Find instant-speed cards, counterspells, flash creatures, and interaction fast
                 </p>
               </div>
             </div>

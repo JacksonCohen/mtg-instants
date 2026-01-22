@@ -1,5 +1,3 @@
-"use cache";
-
 import { notFound } from "next/navigation";
 import { fetchSets, fetchInstantsFromSet } from "@/lib/scryfall-server";
 import { SetPageClient } from "./set-page-client";
@@ -15,12 +13,12 @@ export async function generateMetadata({ params }: SetPageProps) {
 
   if (!set) {
     return {
-      title: "Set Not Found - MTG Instant Reference",
+      title: "Set Not Found - MTG Counterplay Reference",
     };
   }
 
   return {
-    title: `${set.name} Instant-Speed Cards - MTG Instant Reference`,
+    title: `${set.name} Instant-Speed Cards - MTG Counterplay Reference`,
     description: `Browse all instant-speed cards, counterspells, flash creatures, and interaction from ${set.name} (${set.code.toUpperCase()})`,
   };
 }
