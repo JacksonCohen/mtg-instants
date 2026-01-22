@@ -38,6 +38,11 @@ const MANA_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: FilterSidebarProps) {
   const [localManaInput, setLocalManaInput] = useState(filters.manaInput);
 
+  // Sync local input with external filter changes (e.g., clear filters button)
+  useEffect(() => {
+    setLocalManaInput(filters.manaInput);
+  }, [filters.manaInput]);
+
   const toggleColor = useCallback(
     (colorCode: string) => {
       const newColors = filters.colors.includes(colorCode)
@@ -91,7 +96,9 @@ export function FilterSidebar({ filters, onChange, totalCards, filteredCount }: 
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timer);
-  }, [localManaInput, filters, onChange]);
+    // Only depend on localManaInput to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localManaInput]);
 
   const hasActiveFilters = filters.colors.length > 0 || filters.manaValues.length > 0 || filters.counterOnly || filters.manaInput.trim() !== "";
 
