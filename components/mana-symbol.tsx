@@ -126,7 +126,7 @@ export function ManaCost({ cost, size = "md" }: ManaCostProps) {
   return (
     <span className="inline-flex items-center gap-0.5">
       {symbols.map((symbol, index) => (
-        <ManaSymbol key={index} symbol={symbol} size={size} />
+        <ManaSymbol key={`${symbol}-${index}`} symbol={symbol} size={size} />
       ))}
     </span>
   );

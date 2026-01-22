@@ -90,7 +90,7 @@ function CardTile({ card, onClick }: CardTileProps) {
       {!imageLoaded && (
         <div className="absolute inset-0 animate-pulse bg-linear-to-br from-secondary to-muted" />
       )}
-      
+
       {/* Card image */}
       {imageUrl && (
         <Image
@@ -99,11 +99,11 @@ function CardTile({ card, onClick }: CardTileProps) {
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1536px) 25vw, 16vw"
           className={`object-cover transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-          onLoadingComplete={() => setImageLoaded(true)}
+          onLoad={() => setImageLoaded(true)}
           priority={false}
         />
       )}
-      
+
       {/* Glow effect on hover */}
       <div className="absolute inset-0 rounded-lg ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-300" />
     </button>

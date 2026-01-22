@@ -31,7 +31,7 @@ export function SetSymbol({ set, size = "md", showName = false }: SetSymbolProps
           height={32}
           src={set.icon_svg_uri || "/placeholder.svg"}
           alt={`${set.name} set symbol`}
-          className="size-full object-contain opacity-90 dark:invert"
+          className="size-full object-contain opacity-90 invert light:invert-0"
         />
       </div>
       {showName && (
