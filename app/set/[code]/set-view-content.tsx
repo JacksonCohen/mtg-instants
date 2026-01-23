@@ -118,22 +118,10 @@ export function SetViewContent({ cards }: SetViewContentProps) {
       const hasConvoke = card.keywords?.some(k => k.toLowerCase() === "convoke");
       if (!hasConvoke) return false;
 
-      // Check if it matches color filters (if active)
-      if (filters.colors.length > 0) {
-        const cardColors = getCardColors(card);
-        const hasMatchingColor = filters.colors.some((color) => {
-          if (color === "C") {
-            return cardColors.length === 0 || cardColors.includes("C") || cardColors.every(c => c === "C");
-          }
-          return cardColors.includes(color);
-        });
-        if (!hasMatchingColor) return false;
-      }
-
       // Check if it matches counterspell filter (if active)
       if (filters.counterOnly && !card.isCounterspell) return false;
 
-      // Show all convoke cards that match filters but aren't already displayed
+      // Show all convoke cards regardless of color/mana filters
       return true;
     });
   }, [cards, filters, filteredCards]);
