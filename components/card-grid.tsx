@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import type { ScryfallCard } from "@/lib/scryfall";
 import { getCardImageUrl } from "@/lib/scryfall";
 import { CardDetailModal } from "./card-detail-modal";
@@ -91,16 +90,14 @@ function CardTile({ card, onClick }: CardTileProps) {
         <div className="absolute inset-0 animate-pulse bg-linear-to-br from-secondary to-muted" />
       )}
 
-      {/* Card image */}
+      {/* Card image - using native img to avoid Vercel image optimization costs */}
       {imageUrl && (
-        <Image
-          src={imageUrl || "/placeholder.svg"}
+        <img
+          src={imageUrl}
           alt={card.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1536px) 25vw, 16vw"
-          className={`object-cover transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+          loading="lazy"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
           onLoad={() => setImageLoaded(true)}
-          priority={false}
         />
       )}
 

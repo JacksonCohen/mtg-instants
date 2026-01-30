@@ -2,7 +2,6 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { ScryfallCard } from "@/lib/scryfall";
 import { getCardImageUrl, getOracleText } from "@/lib/scryfall";
@@ -133,14 +132,10 @@ export function CardDetailModal({
                 </div>
               )}
               {imageUrl && (
-                <Image
-                  src={imageUrl || "/placeholder.svg"}
+                <img
+                  src={imageUrl}
                   alt={card.name}
-                  fill
-                  className={`object-contain transition-opacity duration-200 ${imageLoading ? "opacity-0" : "opacity-100"
-                    }`}
-                  sizes="(max-width: 768px) 90vw, 50vw"
-                  priority
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ${imageLoading ? "opacity-0" : "opacity-100"}`}
                   onLoad={() => setImageLoading(false)}
                 />
               )}
